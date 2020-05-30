@@ -1,3 +1,20 @@
+// Update this constant with your ServiceNow credentials
+const options = {
+  url: 'https://dev70937.service-now.com/',
+  username: 'admin',
+  password: '1Savvis!'
+};
+
+
+/**
+ * Import the Node.js request package.
+ * See https://www.npmjs.com/package/request
+ */
+const request = require('request');
+
+
+// We'll use this regular expression to verify REST API's HTTP response status code.
+const validResponseRegex = /(2\d\d)/;
 /**
  * @callback iapCallback
  * @description A [callback function]{@link
