@@ -194,27 +194,6 @@ healthcheck(callback) {
             if (error) {
             console.error(`\nError returned from GET request:\n${JSON.stringify(error)}`);
             }
-            if (typeof data === 'object') {
-                if ("body" in data) {
-                    const get_body_object = JSON.parse(data.body);
-                    const change_tickets = get_body_object.result;
-                    let change_tickets_consolidated = [];
-                    for (const change_ticket in change_tickets) {
-                        change_tickets_consolidated.push(
-                            {
-                                "change_ticket_number": change_ticket.number,
-                                "active": change_ticket.active,
-                                "priority": change_ticket.priority,
-                                "description": change_ticket.description,
-                                "work_start": change_ticket.work_start,
-                                "work_end": change_ticket.work_end,
-                                "change_ticket_key": change_ticket.sys_id
-                            }
-                        );
-                    }
-                    return(change_tickets_consolidated);
-                }
-            }
             console.log(`\nResponse returned from GET request:\n${JSON.stringify(data)}`)
         });
   }
@@ -241,24 +220,6 @@ healthcheck(callback) {
 
             if (error) {
             console.error(`\nError returned from POST request:\n${JSON.stringify(error)}`);
-            }
-            if (typeof data === 'object') {
-                if ("body" in data) {
-                    const get_body_object = JSON.parse(data.body);
-                    const change_ticket = get_body_object.result;
-                    const change_ticket_consolidated = 
-                            {
-                                "change_ticket_number": change_ticket.number,
-                                "active": change_ticket.active,
-                                "priority": change_ticket.priority,
-                                "description": change_ticket.description,
-                                "work_start": change_ticket.work_start,
-                                "work_end": change_ticket.work_end,
-                                "change_ticket_key": change_ticket.sys_id
-                            };
-                    }
-                    return(change_tickets_consolidated);
-                }
             }
             console.log(`\nResponse returned from POST request:\n${JSON.stringify(data)}`)
         });
