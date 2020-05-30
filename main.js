@@ -15,6 +15,10 @@ const request = require('request');
 
 // We'll use this regular expression to verify REST API's HTTP response status code.
 const validResponseRegex = /(2\d\d)/;
+
+// Use JSDoc to create a JSDoc data type for an IAP callback.
+// Call the new type iapCallback.
+// Notice iapCallback is a data-first callback.
 /**
  * @callback iapCallback
  * @description A [callback function]{@link
@@ -88,6 +92,23 @@ function processRequestResults(error, response, body, callback) {
    * This function must not check for a hibernating instance;
    * it must call function isHibernating.
    */
+  let callbackData = null;
+  let callbackError = null;
+   
+    if (error) {
+      console.error('Error present.');
+      callbackError = error;
+    } else if (!validResponseRegex.test(response.statusCode)) {
+      console.error('Bad response code.');
+      callbackError = response;
+    } else if (isHibernating(response)) {
+      callbackError = 'Service Now instance is hibernating';
+      console.error(callbackError);
+    } else {
+      callbackData = response;
+    }
+    return callback(callbackData, callbackError);
+
 }
 
 
@@ -108,6 +129,7 @@ function processRequestResults(error, response, body, callback) {
  */
 function sendRequest(callOptions, callback) {
   // Initialize return arguments for callback
+
   let uri;
   if (callOptions.query)
     uri = constructUri(callOptions.serviceNowTable, callOptions.query);
@@ -119,7 +141,17 @@ function sendRequest(callOptions, callback) {
    * from the previous lab. There should be no
    * hardcoded values.
    */
-  const requestOptions = {};
+
+  const requestOptions = {
+    method: callOptions.method,
+    auth: {
+      user: options.username,
+      pass: options.password,
+    },
+    baseUrl: options.url,
+    uri: uri,
+  };
+
   request(requestOptions, (error, response, body) => {
     processRequestResults(error, response, body, (processedResults, processedError) => callback(processedResults, processedError));
   });
@@ -139,6 +171,7 @@ function sendRequest(callOptions, callback) {
  * @param {error} callback.error - The error property of callback.
  */
 function get(callOptions, callback) {
+
   callOptions.method = 'GET';
   callOptions.query = 'sysparm_limit=1';
   sendRequest(callOptions, (results, error) => callback(results, error));
@@ -158,6 +191,7 @@ function get(callOptions, callback) {
  * @param {error} callback.error - The error property of callback.
  */
 function post(callOptions, callback) {
+
   callOptions.method = 'POST';
   sendRequest(callOptions, (results, error) => callback(results, error));
 }
@@ -168,18 +202,25 @@ function post(callOptions, callback) {
  * @description Tests get() and post() functions.
  */
 function main() {
+
   get({ serviceNowTable: 'change_request' }, (data, error) => {
+
     if (error) {
       console.error(`\nError returned from GET request:\n${JSON.stringify(error)}`);
     }
     console.log(`\nResponse returned from GET request:\n${JSON.stringify(data)}`)
   });
+
   post({ serviceNowTable: 'change_request' }, (data, error) => {
+    console.log("inside post");
+
     if (error) {
       console.error(`\nError returned from POST request:\n${JSON.stringify(error)}`);
     }
     console.log(`\nResponse returned from POST request:\n${JSON.stringify(data)}`)
   });
+  
+
 }
 
 
