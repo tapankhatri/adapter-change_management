@@ -115,7 +115,7 @@ healthcheck(callback) {
       * for the callback's errorMessage parameter.
       */
       this.emitOffline();
-      return callback(null,error);
+      //return callback(null,error);
    } else {
      /**
       * Write this block.
@@ -128,7 +128,7 @@ healthcheck(callback) {
       * responseData parameter.
       */
       this.emitOnline();
-      return callback(result);
+      //return callback(result);
    }
  });
  this.emitOnline();
@@ -193,16 +193,20 @@ healthcheck(callback) {
 
             if (error) {
             console.error(`\nError returned from GET request:\n${JSON.stringify(error)}`);
-            }
-            if (typeof data === 'object') {
+            } else if (typeof data === 'object') {
                 if ("body" in data) {
                     const get_body_object = JSON.parse(data.body);
                     const change_tickets = get_body_object.result;
                     let change_tickets_consolidated = [];
-                    for (const change_ticket in change_tickets) {
+                    let i = 0;
+                    for (i = 0; i < change_tickets.length; i++) {
+                        const change_ticket = change_tickets[i];
+                        /*console.log("--- change_ticket start ---");
+                        console.log(change_ticket);
+                        console.log("--- change_ticket end ---");*/
                         change_tickets_consolidated.push(
                             {
-                                "change_ticket_number": change_ticket.number,
+                                "change_ticket_number": change_ticket["number"],
                                 "active": change_ticket.active,
                                 "priority": change_ticket.priority,
                                 "description": change_ticket.description,
@@ -212,10 +216,16 @@ healthcheck(callback) {
                             }
                         );
                     }
-                    return(change_tickets_consolidated);
+                    console.log("-------- GET received object data start -------");
+                    console.log(change_tickets_consolidated);
+                    console.log("-------- GET received object data end -------");
+                    
+                    //return change_tickets_consolidated;
+                    return callback(change_tickets_consolidated, error);
                 }
             }
             console.log(`\nResponse returned from GET request:\n${JSON.stringify(data)}`)
+            
         });
   }
 
@@ -241,11 +251,14 @@ healthcheck(callback) {
 
             if (error) {
             console.error(`\nError returned from POST request:\n${JSON.stringify(error)}`);
-            }
-            if (typeof data === 'object') {
+            } else if (typeof data === 'object') {
+
                 if ("body" in data) {
                     const get_body_object = JSON.parse(data.body);
                     const change_ticket = get_body_object.result;
+                    /*console.log("-------- POST received object data start -------");
+                    console.log(change_ticket);
+                    console.log("-------- POST received object data end -------");*/
                     const change_ticket_consolidated = 
                             {
                                 "change_ticket_number": change_ticket.number,
@@ -256,11 +269,17 @@ healthcheck(callback) {
                                 "work_end": change_ticket.work_end,
                                 "change_ticket_key": change_ticket.sys_id
                             };
+                    console.log("-------- POST received object data start -------");
+                    console.log(change_ticket_consolidated);
+                    console.log("-------- POST received object data end -------");
+
+                    //return(change_ticket_consolidated);
+                    return callback(change_ticket_consolidated, error);
                     }
-                    return(change_tickets_consolidated);
+                    
                 }
-            }
-            console.log(`\nResponse returned from POST request:\n${JSON.stringify(data)}`)
+            
+            console.log(`\nResponse returned from POST request:\n${JSON.stringify(data)}`);
         });
 
   }

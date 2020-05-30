@@ -200,7 +200,9 @@ isHibernating(response) {
     baseUrl: this.options.url,
     uri: uri,
   };
-
+  console.log("--------- connectorjs start -------");
+  console.log(requestOptions);
+  console.log("--------- connectorjs end -------");
   request(requestOptions, (error, response, body) => {
     this.processRequestResults(error, response, body, (processedResults, processedError) => callback(processedResults, processedError));
   });
